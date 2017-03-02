@@ -14,7 +14,7 @@ output:
 
 # R CLI
 
-R could be compared as an electronic calculator. It provides not only basic operations but also advanced features allowing to manipulate distributions.
+R could be compared to an electronic calculator. It provides not only basic operations but also advanced features allowing to manipulate distributions and visualize data.
 
 ```{r}
 1+1
