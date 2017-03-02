@@ -12,7 +12,7 @@ output:
 
 
 
-## R CLI
+# R CLI
 
 R could be compared as an electronic calculator. It provides not only basic operations but also advanced features allowing to manipulate distributions.
 
@@ -24,25 +24,25 @@ plot(density(rnorm(100)))
 ```
 
 
-## R GUI (RStudio)
+# R GUI (RStudio)
 
 https://www.rstudio.com
 
-### working directory
-```{r}
+## working directory
+```{r, eval=FALSE}
 ?getwd()
 ?setwd()
 ```
 
-### scripts
+## scripts
 
-```{r}
+```{r, eval=FALSE}
 source("intro_r.R")
 ```
 
-### data 
+## data 
 
-#### Affectation
+### Affectation
 
 ```{r}
 foo <- 1
@@ -57,7 +57,7 @@ baz
 quz <<- baz
 ```
 
-#### Common types
+### Common types
 
 - numeric
 - factor
@@ -70,13 +70,14 @@ TRUE
 T
 T = 3
 T
-TRUE = 3
+# TRUE = 3
+
 "true"
 as.logical("true")
 ```
 
 
-#### set of data
+### set of data
 
 |    | Homogeneous | Heterogeneous |
 |----|-------------|---------------|
@@ -91,17 +92,28 @@ c(1,"a",10)
 c(TRUE,0)
 v = rnorm(100)
 v[c(5,18,39)]
-
+v[98:100]
 
 list(1,"a",10)
-list(chr="8", tx_start=124330091, tx_end=124410705, gs="ATAD2", ref="hg19", strand="-")
+l = list(chr="8", tx_start=124330091, tx_end=124410705, gs="ATAD2", ref="hg19", strand="-")
+l
 c(tx_start=124330091, tx_end=124410705)
 
 m = matrix(runif(120),20)
-m[3,6]
+m
+m[20,6]
+m[19:20,5:6]
+m[c(17,20),]
+m[,c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE)]
+
 
 data = data.frame(size=rnorm(25)+175, gender=sample(c("M", "F"), 25, replace=TRUE))
 data[1:5,]
+head(data)
+data$gender
+
+
+
 data[data$gender=="M",]
 data[data$gender=="M" & data$size > 170,]
 
@@ -112,13 +124,11 @@ factor(sample(c("10", "J", "Q", "K", "A"), 25, replace=TRUE), levels=c("10", "J"
 
 
 
-### functions
+## functions
 
-#### Common functions
+### Common functions
 
 ```{r}
-?c()
-
 x = c(1,2,3,4,5)
 y = c(2,4,6,8,10)
 length(x)
@@ -132,9 +142,11 @@ dices = floor(rnd * 6)
 barplot(table(dices))
 dices = ceiling(rnd * 6)
 barplot(table(dices))
-pie(table(sum_5_dices))
+pie(table(dices))
 
 mat_5_dices = matrix(dices,5)
+dim(mat_5_dices)
+mat_5_dices[,1:10]
 
 sum_5_dices = apply(mat_5_dices, 2, sum)
 table(sum_5_dices)
@@ -144,7 +156,9 @@ barplot(table(sum_5_dices))
 prop.table(table(sum_5_dices))
 prop.table(table(sum_5_dices))
 sum(prop.table(table(sum_5_dices)))
+```
 
+```{r, eval=FALSE}
 ?ls()
 ?paste()
 
@@ -168,7 +182,7 @@ sum(prop.table(table(sum_5_dices)))
 
 ```
 
-#### Custom functions
+### Custom functions
 
   - signature (parameter)
   - return
@@ -212,45 +226,6 @@ http://adv-r.had.co.nz
 
 http://r-pkgs.had.co.nz
 
+# exercices 
 
-# Other examples 
-
-```{r, eval=FALSE}
-nb_serve = 100000
-dices = as.factor(ceiling(runif(nb_serve*5)*6))
-barplot(table(dices))
-
-serves = matrix(dices,5)
-score = function(s, DEBUG=FALSE) {
-  if (DEBUG) print("_________________________________________")
-  s = sort(s)
-  if (DEBUG) print(s)
-  if (sum(s == 1:5)==5 | sum(s==2:6)==5)  {
-    return(500)
-  }
-  ts = table(s)
-  sum = 0
-  if (max(ts)>=3) {
-    idx = names(which(ts == max(ts)))
-    ts[idx] = ts[idx] - 3
-    if (idx == 1) {
-      sum = sum + 1000
-    } else {
-      sum = sum + as.numeric(idx) * 100      
-    }
-  }
-  if ("1" %in% names(ts)) {
-    sum = sum + 100 * ts["1"]      
-  }
-  if ("5" %in% names(ts)) {
-    sum = sum + 50 * ts["5"]      
-  }
-  if (DEBUG) print(sum)
-  return(sum)
-}
-
-foo = epimedtools::monitored_apply(serves, 2, score)
-
-barplot(table(foo))
-```
-
+http://graal.ens-lyon.fr/~fchuffart/files/data/exercices.pdf
