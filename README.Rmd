@@ -12,7 +12,41 @@ output:
 
 
 
-# R CLI
+# R Software
+
+
+## GNU Public Licence
+
+R is a free software environment for statistical computing and graphics.
+
+More details about GNU, GPL and free software here:
+
+  - https://www.gnu.org/philosophy/free-sw.html
+  - https://en.wikipedia.org/wiki/GNU_General_Public_License
+  - https://en.wikipedia.org/wiki/Free_software_movement
+  - https://en.wikipedia.org/wiki/CeCILL
+
+## R and biology
+
+R is widely is in the life science communauty:
+
+  - https://www.ncbi.nlm.nih.gov/pubmed/?term=r+software
+
+## R Communauty
+
+Many packages are freely available on:
+
+  - CRAN https://cran.r-project.org
+  - Bioconductor https://www.bioconductor.org
+  - GitHub https://github.com
+
+R users is organise as a communauty with many helps topics available on the internet.
+
+
+
+# R CLI vs. GUI
+
+## CLI
 
 R could be compared as an electronic calculator. It provides not only basic operations but also advanced features allowing to manipulate distributions.
 
@@ -24,25 +58,37 @@ plot(density(rnorm(100)))
 ```
 
 
-# R GUI (RStudio)
+## R GUI (RStudio) ***
 
 https://www.rstudio.com
 
+# Let's strat with R!
+
 ## working directory
 ```{r, eval=FALSE}
-?getwd()
-?setwd()
+getwd()
+# ?getwd()
+# ?setwd()
 ```
 
-## scripts
+## From a spreadsheet to R data.frame ***
 
-```{r, eval=FALSE}
-source("intro_r.R")
+```{r}
+data_sh = read.table("data/seahorse_dataset2.csv", sep=";", header=TRUE, dec=".")
+head(data_sh)
+tail(data_sh)
+dim(data_sh)
+summary(data_sh)
+
+data_sh[1,]
+data_sh[,1]
+
 ```
 
-## data 
 
-### Affectation
+# Data 
+
+## Affectation
 
 ```{r}
 foo <- 1
@@ -57,7 +103,7 @@ baz
 quz <<- baz
 ```
 
-### Common types
+## Common types
 
 - numeric
 - factor
@@ -72,12 +118,28 @@ T = 3
 T
 # TRUE = 3
 
-"true"
-as.logical("true")
+is.logical("true")
+is.character("true")
+other_var = as.logical("true")
+other_var
+
+as.character(TRUE)
+as.numeric(TRUE)
+as.numeric(FALSE)
+as.logical(1)
+as.logical(0)
+
+
+
+col_y = c("bleu", "bleu", "vert", "marron", "vert", "marron") 
+col_y
+
+as.factor(col_y)
+
 ```
 
 
-### set of data
+## set of data
 
 |    | Homogeneous | Heterogeneous |
 |----|-------------|---------------|
@@ -121,6 +183,70 @@ factor(sample(c("10", "J", "Q", "K", "A"), 25, replace=TRUE))
 factor(sample(c("10", "J", "Q", "K", "A"), 25, replace=TRUE), levels=c("10", "J", "Q", "K", "A"), ordered=TRUE)
 ```
 
+
+## Selecting lines and columns of a dataset ***
+
+```{r}
+v = 100:130
+v
+v[1]
+v[-1]
+rev(v)[1]
+v[1:4]
+# index by the rank
+v[c(1, 4, 10, 15)]
+# index by mask
+col_y
+col_y[c(TRUE,FALSE, TRUE, TRUE, FALSE, TRUE)]
+
+## select a column
+# by name
+data_sh$id
+# by rank
+data_sh[,2]
+data_sh[,2:6]
+data_sh[,7:11]
+(data_sh[,7:11]/data_sh[,2:6])
+data_sh[,c(FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE, FALSE,FALSE,FALSE)]
+## select a line
+data_sh[1,]
+# both
+ctrl_j1 = data_sh[1:2,2:6]
+case_j1 = data_sh[1:2,7:11]
+# normalization
+data_sh_norm_j1 = case_j1/ctrl_j1
+data_sh_norm_j1
+
+data_sh
+for (i in 2:11) {
+  if (i > 4) {
+    print("It works!!")
+    print(i)
+  }
+  print(mean(data_sh[,i], na.rm = TRUE))
+}
+
+a = 5
+if (a > 4) {
+  print("It works!!")
+}
+
+```
+
+
+
+
+
+
+
+
+# To go further with R
+
+## scripts
+
+```{r, eval=FALSE}
+source("intro_r.R")
+```
 
 
 
@@ -208,13 +334,13 @@ hello_world()
 
  
 
-# control structure
+## control structure
 
 A control structure is a block of programming that analyzes variables and chooses a direction in which to go based on given parameters.
   
 
 
-# algorithm
+## algorithm
 
   An algorithm is a self-contained sequence of actions to be performed. 
   An algorithm is an effective method that can be expressed within a finite amount of space and time.
