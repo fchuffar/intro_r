@@ -234,9 +234,168 @@ if (a > 4) {
 ```
 
 
+# Visualization
+
+```{r, eval=FALSE}
+hist(data$size)
+abline(v=mean(data$mean))
+boxplot(size~gender, data)
+qnorm(data$size)
+qqline(data$size)
+table(data$gender)
+# scatter plot
+barplot(data$gender)
+# b,  l, t, r
+par(mar=c(10,1,1,1))
+```
+
+
+# Tests
+
+## Dataset
+
+```{r}
+# dataset nutri
+data_nutri = read.table("data/data_nutri.csv", sep=",", header=TRUE)
+head(data_nutri)
+tail(data_nutri)
+# Correlation between taille and poids
+plot(data_nutri$taille, data_nutri$poids, col=data_nutri$sexe)
+# create index for categ.
+idx_h = data_nutri$sexe == "Homme"
+idx_f = data_nutri$sexe == "Femme"
+# plot density of each categ.
+plot(density(data_nutri$taille[idx_h]), col=2, xlim=range(data_nutri$taille))
+lines(density(data_nutri$taille[idx_f]))
+```
+## Parametric
+```{r}
+# test de Shapiro-Wilks
+# H0: normality
+# H1: non normality
+# alhpa: 5%
+norm_pop = rnorm(100)
+plot(density(norm_pop))
+shapiro.test(norm_pop)
+# pval = 0.439 > alpha = 5% 
+# on concerve H0 au risque beta à calculer... 
+unif_pop = runif(100)
+plot(density(unif_pop))
+test = shapiro.test(unif_pop)
+test$p.value
+# pval = 0.0001 < alpha = 5%
+# on rejette H0, on accepte H1 au risque de première espèce alpha = 5%
+
+taille_h = data_nutri$taille[idx_h]
+shapiro.test(taille_h)
+# pval = 9.7% > alpha = 5%
+# on concerve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
+
+taille_f = data_nutri$taille[idx_f]
+shapiro.test(taille_f)
+# pval = 11% > alpha = 5%
+# on concerve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
+
+
+# Homoscedasticity
+# H0: homoscedasticity
+# H1: non homoscedasticity
+# alpha: 5%
+
+# egalité des variances
+bartlett.test(
+  rnorm(200, 0, 1), 
+  c(rep("a", 100), rep("b", 100))
+)
+# pval > 5% donc je conserve H0 au rosque beta à calculer
+
+# non egalité des variances
+bartlett.test(
+  c(rnorm(100, 0, 10), rnorm(100, 0, 1)), 
+  c(rep("a", 100), rep("b", 100))
+)
+# pval < 5% donc je rejette H0 et j'accepte H1 au risque alpha de 5%.
+
+bartlett.test(data_nutri$taille, data_nutri$sexe)
+# pval = 16% donc je conserve H0 au seuil beta à calculer.
+
+
+# Sudent test, t test, 
+# H0: t_h == t_f
+# H1: t_h != t_f
+# alpha: 5%
+t.test(taille_h, taille_f, conf.level = 0.95)
+# pval = 2.2e-16 << 5% on rejette H0 et on accepte H1 au seuil alpha de 5%. 
+
+
+# H0: t_h == t_f
+# H1: t_h > t_f
+# alpha: 5%
+t.test(taille_h[1:10], taille_f[1:10], conf.level = 0.95, alternative="greater")
+# pval = 2.2e-16 << 5% on rejette H0 et on accepte H1 au seuil alpha de 5%. 
+
+
+# H0: t_h == t_f
+# H1: t_h < t_f
+# alpha: 5%
+t.test(taille_h, taille_f, conf.level = 0.95, alternative="less")
+# pval = 1 >> 5% on conserve H0 au risque beta, à calculer... 
+
+
+```
+# Non parametric
+```{r}
+# H0: t_h == t_f
+# H1: t_h != t_f
+# alpha: 5%
+wilcox.test(taille_h[1:10], taille_f[1:10], alternative = "two.side") # Mann Withney
+# pval = 0.0001 < alpha = 5% donc je rejette H0 et j'accepte H1 au seuil alpha de 5%
+
+
+# H0: t_h == t_f
+# H1: t_h > t_f
+# alpha: 5%
+test = wilcox.test(taille_h[1:10], taille_f[1:10], alternative = "greater") # Mann Withney
+# pval = 0.00008 < alpha = 5% donc je rejette H0 et j'accepte H1 au seuil alpha de 5%
 
 
 
+if (test$p.value < 0.001) {
+label = paste(signif(test$p.value,2), "***")
+} else if (test$p.value < 0.01) {
+label = paste(signif(test$p.value,2), "**") 
+} else if (test$p.value < 0.05) {
+label = paste(signif(test$p.value,2), "*") 
+} else {
+label = signif(test$p.value,2)
+}
+plot(density(data_nutri$taille[idx_h]), col=2, xlim=range(data_nutri$taille))
+lines(density(data_nutri$taille[idx_f]))
+text(165,0.04, labels=label)
+
+boxplot(data_nutri$taille~data_nutri$sex, las=2)
+text(1.5,180, labels=label)
+
+```
+
+## Empirical p-value 
+
+
+```{r}
+stat_obs = wilcox.test(unique(taille_h)[1:5], unique(taille_f)[1:5], alternative = "two.side")$statistic # Mann Withney
+ 
+stat_rnds = sapply(1:10000, function(i) {  
+  rnd_pop = sample(c(unique(taille_h)[1:5], unique(taille_f)[1:5]))
+  stat_rnd = wilcox.test(rnd_pop[1:5], rnd_pop[6:10], alternative = "two.side")$statistic # Mann Withney
+  return(stat_rnd)
+})
+
+pval_emp = (sum(stat_rnds > stat_obs) + 1)/length(stat_rnds)
+print(pval_emp)
+
+plot(density(stat_rnds))
+abline(v=stat_obs)
+```
 
 
 
