@@ -71,6 +71,14 @@ getwd()
 # ?setwd()
 ```
 
+## organisation of your workspace
+
+- data
+- results
+- src
+- doc
+
+
 ## From a spreadsheet to R data.frame ***
 
 ```{r}
@@ -397,7 +405,42 @@ plot(density(stat_rnds))
 abline(v=stat_obs)
 ```
 
+# statistical test
 
+```{r, eval=FALSE}
+plot_null = function(n, mean=0, sd=1, thresh=TRUE, ...){
+  foo = sapply(1:10000, function(i) {
+    bar = rnorm(n, mean, sd)
+    m = mean(bar)
+    s = sd(bar)
+    c(mean=m, sd = s)
+  })
+  foo = data.frame(t(foo))
+  t = foo$mean / (foo$sd / sqrt(10))  
+  lines(density(foo$mean), ...)
+  if (thresh) abline(v=quantile(foo$mean, c(0.025,0.975)), lty=2, ...)
+  # lines(density(t), lty=2, ...)
+  # lines(density(rt(10000, n-1)), col="grey", lty=3)
+}
+
+layout(matrix(1:2, 1), respect=TRUE)
+plot(0,0,col=0,xlim=c(-1,1), ylim=c(0,2))
+plot_null(10)
+plot_null(10,mean=0.25, thresh=FALSE, col=4)
+# plot_null(20, col=2)
+
+plot(0,0,col=0,xlim=c(-1,1), ylim=c(0,2))
+plot_null(30)
+plot_null(30,mean=0.25, thresh=FALSE, col=4)
+# plot_null(20, col=2)
+
+
+
+# H0: m == 0
+# H1: m != 0
+# alpha = P(reject H0 | H0 is true)
+# beta = P(accept H0 | H0 is false)
+```
 
 # To go further with R
 

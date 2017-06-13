@@ -1,0 +1,158 @@
+---
+title: "Differential Analysis of Affymetrix Mouse Genome 430 2.0 Array - Spermatogenesis Expression Program"
+author: "Florent Chuffart"
+date: "`r Sys.Date()`"
+output: 
+  - rmarkdown::html_document
+---
+
+
+```{r, echo=FALSE, eval=TRUE}
+# knitr::opts_chunk$set(collapse=TRUE, comment = "#>", fig.width=5, fig.height=5, echo=FALSE, eval=TRUE)
+# # loading study
+# library(epimedtools)
+# study_affy = create_study("~/projects/nut/results/expr_program/expr_program_study_affy.rds")
+# # extracting data
+# data = study_affy$data
+# exp_grp = study_affy$exp_grp
+# platform = study_affy$platform
+# # filtering exp_grp
+# exp_grp =exp_grp[exp_grp$sp %in% c("P", "R"),]
+# data = data[,rownames(exp_grp)]
+# # filtering genes
+# platform = platform[!is.na(platform$lower_gs),]
+# platform = platform[sapply(platform$lower_gs, nchar)<10,]
+# platform$iqr = apply(data[rownames(platform),], 1, IQR)
+# platform = platform[order(platform$iqr, decreasing=TRUE),]
+# platform = platform[!duplicated(platform$lower_gs),]
+# data = data[rownames(platform),]
+# rownames(data) = rownames(platform) = platform$lower_gs
+# dim(data)
+# # exporting study
+# write.table(exp_grp , "data/sp_exp_grp.csv" , quote=FALSE, row.names=TRUE)
+# write.table(data    , "data/sp_data.csv"    , quote=FALSE, row.names=TRUE)
+# write.table(platform, "data/sp_platform.csv", quote=TRUE, row.names=TRUE)
+```
+
+# Purpose
+
+In this study_affy, we deal with `r study_affy$platform_name` datasets.
+
+Samples come from differents studies (`r gses`).
+
+Samples are normalized together from .CEL files using ``affy::justRMA`` method.
+
+The __justRMA__ algorithm happens in three steps: 
+
+  * background subtraction
+  * quantile normalization
+  * median polish summarization
+  
+According to its author "the log transformation occurs at the summarization step. i.e. both
+background correction and quantile normalization occur on the natural
+scale" [1]. This three steps are embeded in the compiled function ``rma_c_complete``.
+
+[1] https://support.bioconductor.org/p/50480/
+
+# Dataset
+
+```{r, echo=TRUE}
+# reading data
+exp_grp  = read.table("data/sp_exp_grp.csv" , header=TRUE, row.names=1)
+data     = read.table("data/sp_data.csv"    , header=TRUE, row.names=1)
+platform = read.table("data/sp_platform.csv", header=TRUE, row.names=1)
+
+# experimental design
+head(exp_grp)
+dim(exp_grp)
+
+# transcriptomic data
+head(data)
+dim(data)
+
+# gene metadata
+head(platform[,1:7])
+dim(platform)
+```
+
+# Differential analysis
+
+
+
+We perform differential analysis on our data set.
+
+For each probe:  
+
+  * we compute for each group `logratio` 
+  * we perform t test on this model and harvest corresponding p-value
+
+```{r, eval=TRUE, echo=TRUE, results=TRUE}
+# index of each group
+idx_p = rownames(exp_grp)[exp_grp$sp=="P"]
+idx_r = rownames(exp_grp)[exp_grp$sp=="R"]
+
+# do differential analysis for each probe
+diff_analysis = apply(data, 1, function(l) {
+  # l = data[1,]
+  m_p = mean(l[idx_p])
+  m_r = mean(l[idx_r])
+  logratio = m_r - m_p
+  pval = t.test(l[idx_p], l[idx_r])$p.value
+  # pval = wilcox.test(l[idx_p],l[idx_r])$p.value
+  return(c(logratio=logratio, pval=pval))
+})
+diff_analysis = data.frame(t(diff_analysis))
+
+head(diff_analysis)
+dim(diff_analysis)
+
+# Benjamini Hochberg FDR correction
+layout(1, respect=TRUE)
+diff_analysis$padj =  p.adjust(diff_analysis$pval, method="BH")
+plot(-log10(diff_analysis$pval), -log10(diff_analysis$padj), pch=".")
+abline(h=-log10(0.05), lty=2, col=2)
+legend("bottomright", legend="adj. pval=5%", lty=2, col=2)
+
+# volcano plot
+layout(1, respect=TRUE)
+plot(diff_analysis$logratio, -log10(diff_analysis$padj), pch=".")
+abline(h=-log10(0.05), v=c(-log2(3), log2(3)), lty=2, col=2)
+
+# selecting probes
+up_idx  = rownames(diff_analysis)[diff_analysis$logratio >  log2(3) & diff_analysis$padj<0.05]
+dwn_idx = rownames(diff_analysis)[diff_analysis$logratio < -log2(3) & diff_analysis$padj<0.05]
+dim(data[c(up_idx, dwn_idx),])
+points(diff_analysis[up_idx,]$logratio, -log10(diff_analysis[up_idx,]$padj), col=adjustcolor(2, 0.3))
+points(diff_analysis[dwn_idx,]$logratio, -log10(diff_analysis[dwn_idx,]$padj), col=adjustcolor(4,0.3))
+
+
+# heatmap
+cols = colorRampPalette(c("royalblue", "springgreen", "yellow", "red"))(10)
+d = t(data[c(up_idx, dwn_idx),])
+gplots::heatmap.2(d, main=paste(dim(d), collapse = "x"), 
+  dendrogram="none", Rowv=FALSE, Colv=FALSE, 
+  scale="column",
+  trace="none",
+  density.info="density",
+  col=cols)
+
+# exporting data
+platform$logratio = diff_analysis[rownames(platform),]$logratio
+platform$pval = diff_analysis[rownames(platform),]$pval
+platform$padj = diff_analysis[rownames(platform),]$padj
+platform$updown = NA
+platform[up_idx,]$updown = "UP"
+platform[dwn_idx,]$updown = "DOWN"
+df = platform
+df = df[order(df$updown,-abs(df$logratio)), ]
+WriteXLS::WriteXLS(df, "anadiff.xlsx", AdjWidth=FALSE, BoldHeaderRow=TRUE, row.names=TRUE)
+```
+
+
+
+# Session Information
+
+```{r, results="verbatim"}
+sessionInfo()
+```
+
