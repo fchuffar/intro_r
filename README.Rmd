@@ -11,6 +11,20 @@ output:
 ---
 
 
+# Purpose
+This first R working session will be an introduction to your favourite statistical programming language: R. After a brief introduction to basics (user interface paradigms, free software and GNU), we will go deeply into the details of data structures, data indexing and data visualisation. The main purpose of this session is to offer a not only simple but also powerful alternative to your classical spreadsheet software. This introduction gives you the keys to perform large scale statistical data analysis.
+
+# Prerequisistes
+
+
+Chaque participant apportera son ordinateur portable sur lequel aura été installé les logiciels R et Rstudio :
+
+ * Installer R https://cran.r-project.org/bin/windows/base/
+ * Installer RStudio Desktop Open Source License https://www.rstudio.com/products/rstudio/download/
+
+Le contenu de la session est disponible ici : https://github.com/fchuffar/intro_R
+
+
 
 # R Software
 
