@@ -28,11 +28,11 @@ More details about GNU, GPL and free software here:
 
 ## R and biology
 
-R is widely is in the life science communauty:
+R is widely used in the life science community:
 
   - https://www.ncbi.nlm.nih.gov/pubmed/?term=r+software
 
-## R Communauty
+## R Community
 
 Many packages are freely available on:
 
@@ -40,7 +40,7 @@ Many packages are freely available on:
   - Bioconductor https://www.bioconductor.org
   - GitHub https://github.com
 
-R users is organise as a communauty with many helps topics available on the internet.
+R users are organised as a community with many help topics available on the internet.
 
 
 
@@ -62,16 +62,16 @@ plot(density(rnorm(100)))
 
 https://www.rstudio.com
 
-# Let's strat with R!
+# Let's start with R!
 
-## working directory
+## Working directory
 ```{r, eval=FALSE}
 getwd()
 # ?getwd()
 # ?setwd()
 ```
 
-## organisation of your workspace
+## Organisation of your workspace
 
 - data
 - results
@@ -147,7 +147,7 @@ as.factor(col_y)
 ```
 
 
-## set of data
+## Set of data
 
 |    | Homogeneous | Heterogeneous |
 |----|-------------|---------------|
@@ -328,7 +328,7 @@ bartlett.test(data_nutri$taille, data_nutri$sexe)
 # pval = 16% donc je conserve H0 au seuil beta à calculer.
 
 
-# Sudent test, t test, 
+# Student test, t test, 
 # H0: t_h == t_f
 # H1: t_h != t_f
 # alpha: 5%
@@ -405,7 +405,7 @@ plot(density(stat_rnds))
 abline(v=stat_obs)
 ```
 
-# statistical test
+# Statistical test
 
 ```{r, eval=FALSE}
 plot_null = function(n, mean=0, sd=1, thresh=TRUE, ...){
@@ -444,7 +444,7 @@ plot_null(30,mean=0.25, thresh=FALSE, col=4)
 
 # To go further with R
 
-## scripts
+## Scripts
 
 ```{r, eval=FALSE}
 source("intro_r.R")
@@ -452,7 +452,7 @@ source("intro_r.R")
 
 
 
-## functions
+## Functions
 
 ### Common functions
 
@@ -536,24 +536,24 @@ hello_world()
 
  
 
-## control structure
+## Control structure
 
 A control structure is a block of programming that analyzes variables and chooses a direction in which to go based on given parameters.
   
 
 
-## algorithm
+## Algorithm
 
   An algorithm is a self-contained sequence of actions to be performed. 
   An algorithm is an effective method that can be expressed within a finite amount of space and time.
 
-# Refrences
+# References
 
 
 http://adv-r.had.co.nz
 
 http://r-pkgs.had.co.nz
 
-# exercices 
+# Exercices 
 
 http://graal.ens-lyon.fr/~fchuffart/files/data/exercices.pdf
