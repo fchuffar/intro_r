@@ -223,9 +223,12 @@ v
 v[c(5,18,39)]
 v[98:100]
 
+
+
 list(1,"a",10)
 l = list(chr="8", tx_start=124330091, tx_end=124410705, gs="ATAD2", ref="hg19", strand="-")
 l
+l$chr
 c(tx_start=124330091, tx_end=124410705)
 
 m = matrix(runif(120),nrow=20)
