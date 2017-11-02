@@ -14,6 +14,13 @@ output:
 # Purpose
 This first R working session will be an introduction to your favourite statistical programming language: R. After a brief introduction to basics (user interface paradigms, free software and GNU), we will go deeply into the details of data structures, data indexing and data visualisation. The main purpose of this session is to offer a not only simple but also powerful alternative to your classical spreadsheet software. This introduction gives you the keys to perform large scale statistical data analysis.
 
+This introduction follows three main goals: 
+ 
+  * deploy a fonctionnal working environment for statistical analysis on personnal laptop of participants
+  * design a first script allowing participants to import into R environment data from classical spreadsheet
+  * define common ground of a discussion between life scientists and data analysts
+  
+  
 # Prerequisistes
 
 
@@ -56,7 +63,11 @@ Many packages are freely available on:
 
 R users are organised as a community with many help topics available on the internet.
 
+Many tutorial are available online: 
 
+  - http://revue.sesamath.net/IMG/pdf/RCarte_Commandes-R.pdf
+  - https://cran.r-project.org/doc/contrib/Kauffmann_aide_memoire_R.pdf
+  - https://cran.r-project.org/doc/contrib/Paradis-rdebuts_fr.pdf
 
 # R CLI vs. GUI
 
