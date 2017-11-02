@@ -289,31 +289,7 @@ data_sh$id
 # by rank
 data_sh[,2]
 data_sh[,2:6]
-data_sh[,7:11]
-(data_sh[,7:11]/data_sh[,2:6])
 data_sh[,c(FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE, FALSE,FALSE,FALSE)]
-## select a line
-data_sh[1,]
-# both
-ctrl_j1 = data_sh[1:2,2:6]
-case_j1 = data_sh[1:2,7:11]
-# normalization
-data_sh_norm_j1 = case_j1/ctrl_j1
-data_sh_norm_j1
-
-data_sh
-for (i in 2:11) {
-  if (i > 4) {
-    print("It works!!")
-    print(i)
-  }
-  print(mean(data_sh[,i], na.rm = TRUE))
-}
-
-a = 5
-if (a > 4) {
-  print("It works!!")
-}
 
 ```
 
