@@ -96,7 +96,10 @@ getwd()
 ## From a spreadsheet to R data.frame ***
 
 ```{r}
-data_sh = read.table("data/seahorse_dataset2.csv", sep=";", header=TRUE, dec=".")
+setwd("~/projects/intro_r/")
+#data_sh = read.table("data/seahorse_dataset2.csv", sep=";", header=TRUE, dec=".")
+data_sh = read.table("data/sp_exp_grp.csv", sep=" ", header=TRUE, dec=".")
+# data_sh = read.table("http://...data/sp_exp_grp.csv", sep=" ", header=TRUE, dec=".")
 head(data_sh)
 tail(data_sh)
 dim(data_sh)
@@ -117,7 +120,13 @@ foo <- 1
 foo
 
 bar = "a"
+bar = 'a'
 bar
+# bar = a
+a = 4
+a
+bar = a
+bar 
 
 "b" -> baz
 baz
@@ -128,36 +137,71 @@ quz <<- baz
 ## Common types
 
 - numeric
-- factor
 - character
 - logical (boolean)
+- factor
 
 
 ```{r}
+1
+is.numeric(1)
+0.5
+is.numeric(0.5)
+is.numeric("a")
+foo = 1
+is.numeric(foo)
+
+a = as.integer(1)
+is.integer(a)
+as.integer(0.3)
+
+"iab"
+'toto'
+is.numeric("a")
+is.character("a")
+is.character(1)
+as.character(1)
+as.numeric("a")
+
+paste("a", "b", "b", sep="_")
+paste("a", "b", "b", sep="")
+
+
 TRUE
+FALSE
 T
+F
 T = 3
 T
 # TRUE = 3
+
+is.numeric(TRUE)
+as.numeric(TRUE)
+as.numeric(FALSE)
+as.logical(1)
+as.logical(0)
+as.logical(2)
+as.logical(-2)
+as.logical(-2.2)
 
 is.logical("true")
 is.character("true")
 other_var = as.logical("true")
 other_var
 
-as.character(TRUE)
-as.numeric(TRUE)
-as.numeric(FALSE)
-as.logical(1)
-as.logical(0)
-
-
 
 col_y = c("bleu", "bleu", "vert", "marron", "vert", "marron") 
 col_y
+as.numeric(col_y)
 
-as.factor(col_y)
 
+f = as.factor(col_y)
+f
+as.numeric(f)
+c(f, 1)
+c(f, "BLEU")
+c(f, "bleu")
+c(f, as.factor("vert"))
 ```
 
 
@@ -175,6 +219,7 @@ c(1,2,10)
 c(1,"a",10)
 c(TRUE,0)
 v = rnorm(100)
+v
 v[c(5,18,39)]
 v[98:100]
 
@@ -183,11 +228,13 @@ l = list(chr="8", tx_start=124330091, tx_end=124410705, gs="ATAD2", ref="hg19", 
 l
 c(tx_start=124330091, tx_end=124410705)
 
-m = matrix(runif(120),20)
+m = matrix(runif(120),nrow=20)
+dim(m)
 m
 m[20,6]
 m[19:20,5:6]
 m[c(17,20),]
+m[,c(1,2)]
 m[,c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE)]
 
 
@@ -196,7 +243,8 @@ data[1:5,]
 head(data)
 data$gender
 
-
+data[1,2] = "m"
+data[1,2]
 
 data[data$gender=="M",]
 data[data$gender=="M" & data$size > 170,]

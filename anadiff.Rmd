@@ -63,7 +63,7 @@ data     = read.table("data/sp_data.csv"    , header=TRUE, row.names=1)
 platform = read.table("data/sp_platform.csv", header=TRUE, row.names=1)
 
 # experimental design
-head(exp_grp)
+exp_grp
 dim(exp_grp)
 
 # transcriptomic data
@@ -93,7 +93,9 @@ idx_r = rownames(exp_grp)[exp_grp$sp=="R"]
 
 # do differential analysis for each probe
 diff_analysis = apply(data, 1, function(l) {
-  # l = data[1,]
+#  l = unlist(data[1,])
+#  print(l)
+#  boxplot(list(P=l[idx_p], R=l[idx_r]))
   m_p = mean(l[idx_p])
   m_r = mean(l[idx_r])
   logratio = m_r - m_p
@@ -116,24 +118,25 @@ legend("bottomright", legend="adj. pval=5%", lty=2, col=2)
 # volcano plot
 layout(1, respect=TRUE)
 plot(diff_analysis$logratio, -log10(diff_analysis$padj), pch=".")
-abline(h=-log10(0.05), v=c(-log2(3), log2(3)), lty=2, col=2)
+abline(h=-log10(0.01), v=c(-log2(3), log2(3)), lty=2, col=2)
 
 # selecting probes
-up_idx  = rownames(diff_analysis)[diff_analysis$logratio >  log2(3) & diff_analysis$padj<0.05]
-dwn_idx = rownames(diff_analysis)[diff_analysis$logratio < -log2(3) & diff_analysis$padj<0.05]
+up_idx  = rownames(diff_analysis)[diff_analysis$logratio >  log2(3) & diff_analysis$padj<0.01]
+dwn_idx = rownames(diff_analysis)[diff_analysis$logratio < -log2(3) & diff_analysis$padj<0.01]
 dim(data[c(up_idx, dwn_idx),])
 points(diff_analysis[up_idx,]$logratio, -log10(diff_analysis[up_idx,]$padj), col=adjustcolor(2, 0.3))
 points(diff_analysis[dwn_idx,]$logratio, -log10(diff_analysis[dwn_idx,]$padj), col=adjustcolor(4,0.3))
-
+  
 
 # heatmap
 cols = colorRampPalette(c("royalblue", "springgreen", "yellow", "red"))(10)
 d = t(data[c(up_idx, dwn_idx),])
 gplots::heatmap.2(d, main=paste(dim(d), collapse = "x"), 
-  dendrogram="none", Rowv=FALSE, Colv=FALSE, 
+  dendrogram="row", 
+  Rowv=TRUE, 
+  Colv=FALSE, 
   scale="column",
-  trace="none",
-  density.info="density",
+  trace="none", density.info="density",
   col=cols)
 
 # exporting data
