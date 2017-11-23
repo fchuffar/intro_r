@@ -320,6 +320,7 @@ par(mar=c(10,1,1,1))
 data_nutri = read.table("data/data_nutri.csv", sep=",", header=TRUE)
 head(data_nutri)
 tail(data_nutri)
+dim(data_nutri)
 # Correlation between taille and poids
 plot(data_nutri$taille, data_nutri$poids, col=data_nutri$sexe)
 # create index for categ.
@@ -328,6 +329,14 @@ idx_f = data_nutri$sexe == "Femme"
 # plot density of each categ.
 plot(density(data_nutri$taille[idx_h]), col=2, xlim=range(data_nutri$taille))
 lines(density(data_nutri$taille[idx_f]))
+
+boxplot(taille~sexe, data=data_nutri)
+library(beanplot)
+beanplot(taille~sexe, data=data_nutri)
+
+library(beeswarm)
+beeswarm(taille~sexe, data=data_nutri)
+
 ```
 ## Parametric
 ```{r}
@@ -339,7 +348,7 @@ norm_pop = rnorm(100)
 plot(density(norm_pop))
 shapiro.test(norm_pop)
 # pval = 0.439 > alpha = 5% 
-# on concerve H0 au risque beta à calculer... 
+# on conserve H0 au risque beta à calculer... 
 unif_pop = runif(100)
 plot(density(unif_pop))
 test = shapiro.test(unif_pop)
@@ -350,12 +359,12 @@ test$p.value
 taille_h = data_nutri$taille[idx_h]
 shapiro.test(taille_h)
 # pval = 9.7% > alpha = 5%
-# on concerve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
+# on conserve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
 
 taille_f = data_nutri$taille[idx_f]
 shapiro.test(taille_f)
 # pval = 11% > alpha = 5%
-# on concerve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
+# on conserve H0 au risque beta à calculer... beta contrôlé dans le cas de shapiro.test.
 
 
 # Homoscedasticity
@@ -363,16 +372,25 @@ shapiro.test(taille_f)
 # H1: non homoscedasticity
 # alpha: 5%
 
-# egalité des variances
+pop1 =   rnorm(100, 0, 1)
+pop2 =   rnorm(100, 10, 1) 
+plot(density(pop1), xlim=c(-5,15))
+lines(density(pop2), col=2)
+
+# homogénéité des variances
 bartlett.test(
-  rnorm(200, 0, 1), 
+  c(pop1, pop2), 
   c(rep("a", 100), rep("b", 100))
 )
 # pval > 5% donc je conserve H0 au rosque beta à calculer
 
-# non egalité des variances
+pop1 =   rnorm(100, 0, 0.1)
+pop2 =   rnorm(100, 10, 1) 
+plot(density(pop1), xlim=c(-5,15))
+lines(density(pop2), col=2)
+# non homogénéité des variances
 bartlett.test(
-  c(rnorm(100, 0, 10), rnorm(100, 0, 1)), 
+  c(pop1, pop2), 
   c(rep("a", 100), rep("b", 100))
 )
 # pval < 5% donc je rejette H0 et j'accepte H1 au risque alpha de 5%.
@@ -392,7 +410,9 @@ t.test(taille_h, taille_f, conf.level = 0.95)
 # H0: t_h == t_f
 # H1: t_h > t_f
 # alpha: 5%
+t.test(taille_h, taille_f, conf.level = 0.95, alternative="greater")
 t.test(taille_h[1:10], taille_f[1:10], conf.level = 0.95, alternative="greater")
+t.test(taille_h[1:10], taille_f[1:10], conf.level = 0.95, alternative="two.sided")
 # pval = 2.2e-16 << 5% on rejette H0 et on accepte H1 au seuil alpha de 5%. 
 
 
