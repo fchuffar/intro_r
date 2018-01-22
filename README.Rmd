@@ -27,11 +27,12 @@ This introduction follows three main goals:
 
 Chaque participant apportera son ordinateur portable sur lequel aura été installé les logiciels R et Rstudio :
 
- * Installer R https://cran.r-project.org/bin/windows/base/
+ * Installer R (macosx https://cran.r-project.org/bin/macosx/ ) (windows https://cran.r-project.org/bin/windows/base/ )
  * Installer RStudio Desktop Open Source License https://www.rstudio.com/products/rstudio/download/
 
 Le contenu de la session est disponible ici : https://github.com/fchuffar/intro_R
-
+Il doit être téléchargé en cliquant sur le bouton vert en hautr à droite "Clone or Download", puis "Download ZIP".
+La première séance se déroulera intégralement dans cette espace de travail.
 
 
 # R Software
@@ -601,6 +602,122 @@ hello_world()
 
 ```
 
+
+
+
+# Practical session
+
+## SRSF2 and SOX2 signatures in squamous cell lung carcinomas (data set suggested by Beatrice Eymin)
+
+We dispose of 5 Affymetrix Human Genome U133A Array probe values for 130 samples
+These 5 probes correspond to 2 genes:
+ 
+  -  200753_x_at (SRSF)
+  -  200754_x_at (SRSF)
+  -  214882_s_at (SRSF)
+  -  213721_at   (SOX2)
+  -  213722_at   (SOX2)
+
+We also dispose of clinical data for the 130 samples.
+
+i) We want to check the correlation between probes
+ii) We want to analyse the expressin of these genes according cancer stage
+
+```{r}
+# loading data
+data = read.csv("data/GSE4573.csv", row.names=1)
+head(data)
+dim(data)
+
+# correlation between probes
+pairs((data[,1:5]))
+pairs2 = function (...) {
+    panel.cor = function(x, y, digits = 2, prefix = "", cex.cor, 
+        ...) {
+        usr = par("usr")
+        on.exit(par(usr))
+        par(usr = c(0, 1, 0, 1))
+        r = abs(cor(x, y))
+        txt = format(c(r, 0.123456789), digits = digits)[1]
+        txt = paste(prefix, txt, sep = "")
+        if (missing(cex.cor)) 
+            cex = 0.8/strwidth(txt)
+        test = cor.test(x, y)
+        Signif = symnum(test$p.value, corr = FALSE, na = FALSE, 
+            cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", 
+                "**", "*", ".", " "))
+        text(0.5, 0.5, txt, cex = cex * r)
+        text(0.8, 0.8, Signif, cex = cex, col = 2)
+    }
+    pairs(..., upper.panel = panel.cor)
+}
+pairs2((data[,1:5]))
+
+
+# distribution
+layout(matrix(1:6, 2), respect=TRUE)
+plot(density(data[,"X200753_x_at"]))
+plot(density(data[,"X200754_x_at"]))
+plot(density(data[,"X214882_s_at"]))
+plot(density(data[,"X213721_at"  ]))
+plot(density(data[,"X213722_at"  ]))
+
+
+# stages
+data$STAGE
+idx_grp1 = data$STAGE %in% c("Ia", "Ib", "IIa", "IIb")
+idx_grp2 = data$STAGE %in% c("IIIa", "IIIb")
+data$stage_grps = NA
+data[idx_grp1,]$stage_grps = "grp1"
+data[idx_grp2,]$stage_grps = "grp2"
+
+
+layout(matrix(1:6, 2), respect=TRUE)
+beanplot::beanplot(X200753_x_at~stage_grps, data)
+beanplot::beanplot(X200754_x_at~stage_grps, data)
+beanplot::beanplot(X214882_s_at~stage_grps, data)
+beanplot::beanplot(X213721_at  ~stage_grps, data)
+beanplot::beanplot(X213722_at  ~stage_grps, data)
+
+t.test(data[idx_grp1, "X200753_x_at"], data[idx_grp2, "X200753_x_at"])
+t.test(data[idx_grp1, "X200754_x_at"], data[idx_grp2, "X200754_x_at"])
+t.test(data[idx_grp1, "X214882_s_at"], data[idx_grp2, "X214882_s_at"])
+t.test(data[idx_grp1, "X213721_at"  ], data[idx_grp2, "X213721_at"  ])
+t.test(data[idx_grp1, "X213722_at"  ], data[idx_grp2, "X213722_at"  ])
+
+wilcox.test(data[idx_grp1, "X200753_x_at"], data[idx_grp2, "X200753_x_at"])
+wilcox.test(data[idx_grp1, "X200754_x_at"], data[idx_grp2, "X200754_x_at"])
+wilcox.test(data[idx_grp1, "X214882_s_at"], data[idx_grp2, "X214882_s_at"])
+wilcox.test(data[idx_grp1, "X213721_at"  ], data[idx_grp2, "X213721_at"  ])
+wilcox.test(data[idx_grp1, "X213722_at"  ], data[idx_grp2, "X213722_at"  ])
+
+
+layout(matrix(1:6, 2), respect=TRUE)
+beanplot::beanplot(X200753_x_at~SEX, data)
+beanplot::beanplot(X200754_x_at~SEX, data)
+beanplot::beanplot(X214882_s_at~SEX, data)
+beanplot::beanplot(X213721_at  ~SEX, data)
+beanplot::beanplot(X213722_at  ~SEX, data)
+
+
+layout(matrix(1:6, 2), respect=TRUE)
+plot(data[,"X200753_x_at"], data$AGE)
+plot(data[,"X200754_x_at"], data$AGE)
+plot(data[,"X214882_s_at"], data$AGE)
+plot(data[,"X213721_at"  ], data$AGE)
+plot(data[,"X213722_at"  ], data$AGE)
+
+layout(matrix(1:6, 2), respect=TRUE)
+beanplot::beanplot(X200753_x_at~T, data)
+beanplot::beanplot(X200754_x_at~T, data)
+beanplot::beanplot(X214882_s_at~T, data)
+beanplot::beanplot(X213721_at  ~T, data)
+beanplot::beanplot(X213722_at  ~T, data)
+
+
+
+
+```
 
 
 
