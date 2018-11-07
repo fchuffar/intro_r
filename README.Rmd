@@ -79,9 +79,12 @@ R could be compared to an electronic calculator. It provides not only basic oper
 
 ```{r}
 1+1
+2+2
 pi
 rnorm(100)
 plot(density(rnorm(100)))
+lines(density(rnorm(100, sd=2)), col=2)
+lines(density(rnorm(100, sd=0.3, mean=1)), col=3)
 ```
 
 
@@ -94,7 +97,9 @@ https://www.rstudio.com
 ## Working directory
 ```{r, eval=FALSE}
 getwd()
+# this command give the help on...
 # ?getwd()
+# ?rnorm
 # ?setwd()
 ```
 
@@ -109,14 +114,23 @@ getwd()
 ## From a spreadsheet to R data.frame ***
 
 ```{r}
-setwd("~/projects/intro_r/")
 #data_sh = read.table("data/seahorse_dataset2.csv", sep=";", header=TRUE, dec=".")
 data_sh = read.table("data/sp_exp_grp.csv", sep=" ", header=TRUE, dec=".")
-# data_sh = read.table("http://...data/sp_exp_grp.csv", sep=" ", header=TRUE, dec=".")
+data_sh["GSE21749_P_WT_1",]
+data_sh[,1]
 head(data_sh)
 tail(data_sh)
 dim(data_sh)
 summary(data_sh)
+
+d = read.table("data/data_nutri.csv", header=TRUE, sep=",", row.names = 1)
+head(d)
+tail(d)
+dim(d)
+summary(d)
+
+
+
 
 data_sh[1,]
 data_sh[,1]
@@ -158,15 +172,28 @@ quz <<- baz
 ```{r}
 1
 is.numeric(1)
+a=1
+is.numeric(a)
+a="nom"
+a
+is.numeric(a)
 0.5
 is.numeric(0.5)
 is.numeric("a")
 foo = 1
 is.numeric(foo)
 
+is.integer(1)
 a = as.integer(1)
+a
 is.integer(a)
 as.integer(0.3)
+
+as.integer(TRUE)
+as.integer(FALSE)
+
+as.numeric(TRUE)
+as.numeric(FALSE)
 
 "iab"
 'toto'
@@ -176,17 +203,31 @@ is.character(1)
 as.character(1)
 as.numeric("a")
 
-paste("a", "b", "b", sep="_")
-paste("a", "b", "b", sep="")
+conc = c(0.1, 0.2, 0.3, "probleme de manip", 0.1)
+conc = c(0.1, 0.2, 0.3, "probleme de manip", 0.1)
+conc
+as.numeric(conc)
+conc2 = c(0.1, 0.2, 0.3, NA, 0.1)
+conc2
+mean(conc2)
+mean(conc2, na.rm=TRUE)
+
+NaN
+log(0)
+1/0
 
 
+
+# logicals
 TRUE
 FALSE
 T
 F
 T = 3
+T = FALSE
 T
 # TRUE = 3
+# NA = 3
 
 is.numeric(TRUE)
 as.numeric(TRUE)
@@ -201,20 +242,17 @@ is.logical("true")
 is.character("true")
 other_var = as.logical("true")
 other_var
+as.logical("True")
 
-
-col_y = c("bleu", "bleu", "vert", "marron", "vert", "marron") 
+# factors
+col_y = c("bleu", "bleu", "vert", "marron", "vert", "marron", "blue", " blue") 
 col_y
-as.numeric(col_y)
-
-
+f = as.factor(col_y)
+f
+col_y = c("bleu", "bleu", "vert", "marron", "vert", "marron", "bleu", "bleu") 
 f = as.factor(col_y)
 f
 as.numeric(f)
-c(f, 1)
-c(f, "BLEU")
-c(f, "bleu")
-c(f, as.factor("vert"))
 ```
 
 
@@ -225,6 +263,7 @@ c(f, as.factor("vert"))
 | 1d |  vector     | list          |
 | 2d |  matrix     | data.frame    |
 
+a data.frame is a list of same size vectors (colums).
 
 ```{r}
 1:5
@@ -235,8 +274,12 @@ v = rnorm(100)
 v
 v[c(5,18,39)]
 v[98:100]
+v[c(1,2,3)]
+v[1:3]
+h = v
 
-
+v
+v[c(1,2,3)]
 
 list(1,"a",10)
 l = list(chr="8", tx_start=124330091, tx_end=124410705, gs="ATAD2", ref="hg19", strand="-")
@@ -244,9 +287,13 @@ l
 l$chr
 c(tx_start=124330091, tx_end=124410705)
 
+
+
+# matrix
 m = matrix(runif(120),nrow=20)
 dim(m)
 m
+m+1
 m[20,6]
 m[19:20,5:6]
 m[c(17,20),]
@@ -261,6 +308,7 @@ data$gender
 
 data[1,2] = "m"
 data[1,2]
+data[1,2] = "M"
 
 data[data$gender=="M",]
 data[data$gender=="M" & data$size > 170,]
@@ -318,7 +366,7 @@ par(mar=c(10,1,1,1))
 
 ```{r}
 # dataset nutri
-data_nutri = read.table("data/data_nutri.csv", sep=",", header=TRUE)
+data_nutri = read.table("data/data_nutri.csv", sep=",", header=TRUE, row.names=1)
 head(data_nutri)
 tail(data_nutri)
 dim(data_nutri)
@@ -344,7 +392,7 @@ beeswarm(taille~sexe, data=data_nutri)
 # test de Shapiro-Wilks
 # H0: normality
 # H1: non normality
-# alhpa: 5%
+# alpha: 5%
 norm_pop = rnorm(100)
 plot(density(norm_pop))
 shapiro.test(norm_pop)
@@ -747,3 +795,101 @@ http://r-pkgs.had.co.nz
 # Exercices 
 
 http://graal.ens-lyon.fr/~fchuffart/files/data/exercices.pdf
+
+
+
+# RegLog
+
+
+```{r}
+d = data_nutri
+layout(matrix(1:2, 1), respect=TRUE)
+
+plot(d$taille, d$poids)
+# Y~B
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
+m = lm(d$poids~d$taille)
+m = lm(poids~taille, d)
+m$coefficients
+m$residuals
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
+# arrows(d$taille, d$poids, d$taille+m$residuals, d$poids, col=adjustcolor(1, alpha.f=0.5))
+arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
+
+
+
+layout(matrix(1:2, 1), respect=TRUE)
+plot(d$taille, d$poids)
+# Y~B
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
+m = lm(d$poids~d$taille)
+m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
+plot(d$taille, d$poids-m$residuals, col=1)
+arrows(d$taille, d$poids, d$taille, d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
+
+
+
+
+
+
+
+
+d = data_nutri
+layout(matrix(1:2, 1), respect=TRUE)
+
+plot(d$sex, d$poids)
+# Y~B
+# E(Y) = b.X
+# E(Y) = b_0 + b_1.X
+# Y_i = b_0 + b_1.X_i + e_i
+m = lm(d$poids~d$sex)
+m$coefficients
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
+plot(1:nrow(d), d$poids-m$residuals, col=1)
+arrows(1:nrow(d), d$poids, 1:nrow(d), d$poids-m$residuals, col=adjustcolor(1, alpha.f=0.5))
+
+
+
+
+
+
+
+
+
+
+abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
+
+
+arrows(d$taille, d$poids, d$taille + 0.5*m$coefficients[[2]]*m$residuals, d$poids - sqrt(m$coefficients[[2]]*m$residuals), col=adjustcolor(1, alpha.f=0.5))
+
+
+arrows(d$taille, d$poids, d$taille + 0.5*m$coefficients[[2]]*m$residuals, d$poids - sqrt(m$coefficients[[2]]*m$residuals), col=adjustcolor(1, alpha.f=0.5))
+
+# plot( d$poids, d$taille)
+# m = lm(d$taille~d$poids)
+# m = lm(taille~poids, d)
+# m$coefficients
+# m$residuals
+# arrows(d$poids, d$taille, d$poids+m$residuals, d$taille, col=adjustcolor(1, alpha.f=0.5))
+# abline(a=m$coefficients[[1]], b=m$coefficients[[2]], col=2)
+#
+
+plot(density(m$residuals))
+
+plot(data_nutri$sexe, data_nutri$taille)
+
+
+```
+# Session Information
+
+```{r, results="verbatim"}
+sessionInfo()
+```
+
+
+
